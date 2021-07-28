@@ -1,6 +1,6 @@
-namespace EFund.Domain.Models
+namespace EFund.Database.Entities
 {
-    public class HedgeFundInfo
+    public class HedgeFundInfo : ChainDependModelBase
     {
         public string ContractAddress { get; set; }
         

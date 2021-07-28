@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using EFund.Database.Entities;
 using EFund.Domain.Models;
 using EFund.Domain.Models.Repositories.Abstract;
 using EFund.Domain.Services;
@@ -28,10 +30,10 @@ namespace EFund.Api.Controllers
 
         [HttpPost("createFundInfo"), DisableRequestSizeLimit]
         public async Task CreateHedgeFundInfo(
-                                                [FromForm] IFormFile image,
-                                                [FromForm] string contractaddress,
-                                                [FromForm] string description,
-                                                [FromForm] string name)
+                                                [Required] [FromForm] IFormFile image,
+                                                [Required] [FromForm] string contractaddress,
+                                                [Required] [FromForm] string description,
+                                                [Required] [FromForm] string name)
         {
             await _hedgeFundService.CreateNewFundInfo(image, new HedgeFundInfo { ContractAddress = contractaddress, Description = description, Name = name });
         }

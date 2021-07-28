@@ -21,9 +21,6 @@ namespace EFund.Api
         {
             Configuration.Bind("Project", new Config());
 
-            services.AddScoped<IHedgeFundInfosRepository, HedgeFundRepository>(_ =>
-                new HedgeFundRepository(Config.ConnectionString));
-
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "AllowAll",

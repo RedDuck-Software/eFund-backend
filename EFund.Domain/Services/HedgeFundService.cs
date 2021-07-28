@@ -1,4 +1,6 @@
-﻿using EFund.Domain.Models;
+﻿using Api.Service;
+using EFund.Database.Entities;
+using EFund.Domain.Models;
 using EFund.Domain.Models.Repositories.Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -20,15 +22,24 @@ namespace EFund.Domain.Services
     {
         private readonly string _connectionString;
 
-        public HedgeFundService(IConfiguration configuration)
+        private readonly ImageService _imageService;
+
+        private readonly int _chainId;
+
+        public HedgeFundService(int chainId, IConfiguration configuration, ImageService imageService)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _imageService = imageService;
         }
 
         public async Task CreateNewFundInfo(IFormFile image, HedgeFundInfo info)
         {
-            using (var hRepo = new HedgeFundRepository(_connectionString))
+            using (var hRepo = new HedgeFundRepository(_connectionString, _chainId))
             {
+                var path = await _imageService.SaveImage(image, info.ContractAddress);
+
+                info.ImageUrl = path;
+
                 if (await hRepo.GetHedgeFundInfoByContractAddress(info.ContractAddress) != null)
                     throw new ArgumentException($"Database is already contains information about contract with address {info.ContractAddress}");
 
@@ -38,8 +49,8 @@ namespace EFund.Domain.Services
 
         public async Task<HedgeFundInfo> GetHedgeFundInfoByContractAddress(string contractAddress)
         {
-            using (var hRepo = new HedgeFundRepository(_connectionString))
-                return await hRepo.GetHedgeFundInfoByContractAddress(contractAddress); 
+            using (var hRepo = new HedgeFundRepository(_connectionString, _chainId))
+                return await hRepo.GetHedgeFundInfoByContractAddress(contractAddress);
         }
     }
 }
