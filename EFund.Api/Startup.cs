@@ -1,3 +1,4 @@
+using EFund.Api.Attributes;
 using EFund.Api.Service;
 using EFund.Domain.Models.Repositories.Abstract;
 using EFund.Domain.Models.Repositories.Dapper;
@@ -13,16 +14,16 @@ namespace EFund.Api
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        
+
         public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public void ConfigureServices(IServiceCollection services)
         {
             Configuration.Bind("Project", new Config());
 
-            services.AddScoped<IHedgeFundInfosRepository, DapperHedgeFundInfosRepository>(_ =>
-                new DapperHedgeFundInfosRepository(Config.ConnectionString));
-            
+            services.AddScoped<IHedgeFundInfosRepository, HedgeFundRepository>(_ =>
+                new HedgeFundRepository(Config.ConnectionString));
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "AllowAll",
@@ -33,9 +34,13 @@ namespace EFund.Api
                             .AllowAnyMethod();
                     });
             });
-            
+
             services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "EFund.Api", Version = "v1"}); });
+            services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EFund.Api", Version = "v1" });
+                    c.OperationFilter<SwaggerFileOperationFilter>();
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -45,6 +50,7 @@ namespace EFund.Api
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EFund.Api v1"));
+
             }
 
             app.UseHttpsRedirection();

@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using EFund.Domain.Models;
 using EFund.Domain.Models.Repositories.Abstract;
+using EFund.Domain.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -14,19 +17,27 @@ namespace EFund.Api.Controllers
     public class HedgeFundInfoController : ControllerBase
     {
         private readonly ILogger<HedgeFundInfoController> _logger;
-        private readonly IHedgeFundInfosRepository _repository;
-        
-        public HedgeFundInfoController(ILogger<HedgeFundInfoController> logger, IHedgeFundInfosRepository repository)
+
+        private readonly IHedgeFundService _hedgeFundService;
+
+        public HedgeFundInfoController(ILogger<HedgeFundInfoController> logger, IHedgeFundService hedgeFundService)
         {
             _logger = logger;
-            _repository = repository;
+            _hedgeFundService = hedgeFundService;
         }
 
-        [HttpGet]
-        public IEnumerable<HedgeFundInfo> GetHedgeFundInfos() => _repository.GetHedgeFundInfos();
+        [HttpPost("createFundInfo"), DisableRequestSizeLimit]
+        public async Task CreateHedgeFundInfo(
+                                                [FromForm] IFormFile image,
+                                                [FromForm] string contractaddress,
+                                                [FromForm] string description,
+                                                [FromForm] string name)
+        {
+            await _hedgeFundService.CreateNewFundInfo(image, new HedgeFundInfo { ContractAddress = contractaddress, Description = description, Name = name });
+        }
 
-        [HttpGet("{contractId}")]
-        public HedgeFundInfo GetHedgeFundInfoByContractId(string contractId) =>
-            _repository.GetHedgeFundInfoByContractId(contractId);
+        [HttpGet("{contractAddress}")]
+        public async Task<HedgeFundInfo> GetHedgeFundInfoByContractId(string contractAddress) =>
+            await _hedgeFundService.GetHedgeFundInfoByContractAddress(contractAddress);
     }
 }

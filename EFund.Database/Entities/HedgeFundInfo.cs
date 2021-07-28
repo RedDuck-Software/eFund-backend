@@ -2,7 +2,7 @@ namespace EFund.Domain.Models
 {
     public class HedgeFundInfo
     {
-        public string ContractId { get; set; }
+        public string ContractAddress { get; set; }
         
         public string Name { get; set; }
         

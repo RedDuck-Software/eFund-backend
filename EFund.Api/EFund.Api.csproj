@@ -9,6 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EFund.Database\EFund.Database.csproj" />
       <ProjectReference Include="..\EFund.Domain\EFund.Domain.csproj" />
     </ItemGroup>
 

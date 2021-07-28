@@ -1,7 +1,0 @@
-CREATE DATABASE IF NOT EXISTS [efund];
-USE [efund];
-CREATE TABLE [hedgefund_infos] (
-  [ContractId] VARCHAR(255) NOT NULL PRIMARY KEY,
-  [Name] VARCHAR(255) NOT NULL,
-  [Description] VARCHAR(255) NOT NULL
-);
