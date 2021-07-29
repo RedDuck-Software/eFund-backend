@@ -11,7 +11,7 @@ CREATE TABLE [hedgefund_infos] (
   [ContractId] BINARY(20) NOT NULL PRIMARY KEY,
   [ChainId] SMALLINT NOT NULL FOREIGN KEY REFERENCES network([ChainId]),
   [Name] VARCHAR(255) NOT NULL,
-  [Description] VARCHAR(255) NOT NULL, 
+  [Description] VARCHAR(255) NULL, 
   [ImageUrl] VARCHAR(100) NOT NULL, 
 );
 

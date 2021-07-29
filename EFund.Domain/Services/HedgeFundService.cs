@@ -18,7 +18,7 @@ namespace EFund.Domain.Services
         Task<HedgeFundInfo> GetHedgeFundInfoByContractAddress(string contractAddress);
     }
 
-    class HedgeFundService : IHedgeFundService
+    public class HedgeFundService : IHedgeFundService
     {
         private readonly string _connectionString;
 
