@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace EFund.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class HedgeFundInfoController : BaseController
     {
         protected IHedgeFundService HedgeFundService => new HedgeFundService(CurrentNetwork.ChainId, Configuration, ImageService);
@@ -37,10 +37,10 @@ namespace EFund.Api.Controllers
         [HttpPost("createFundInfo"), DisableRequestSizeLimit]
         [ChainSpecified]
         public async Task CreateHedgeFundInfo(
-                                                [FromForm] IFormFile image,
-                                                [FromForm] string description,
-                                                [Required] [FromForm] string contractaddress,
-                                                [Required] [FromForm] string name)
+                                                IFormFile image,
+                                                [FromQuery] string description,
+                                                [Required] [FromQuery] [RegularExpression("^0x[a-fA-F0-9]{40}$")] string contractaddress,
+                                                [Required] [FromQuery] string name)
         {
             await HedgeFundService.CreateNewFundInfo(image, new HedgeFundInfo { ContractAddress = contractaddress, Description = description, Name = name });
         }

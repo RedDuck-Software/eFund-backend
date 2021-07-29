@@ -30,13 +30,14 @@ namespace EFund.Domain.Services
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
             _imageService = imageService;
+            _chainId = chainId;
         }
 
         public async Task CreateNewFundInfo(IFormFile image, HedgeFundInfo info)
         {
             using (var hRepo = new HedgeFundRepository(_connectionString, _chainId))
             {
-                var path = await _imageService.SaveImage(image, info.ContractAddress);
+                var path = await _imageService.SaveImage(image, info.ContractAddress, _chainId);
 
                 info.ImageUrl = path;
 

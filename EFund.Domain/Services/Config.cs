@@ -6,6 +6,6 @@ namespace EFund.Api.Service
     {
         public static string ConnectionString { get; set; }
 
-        public static string GenericSingNonce => RandomStringGenerator.Generate(100);
+        public static string GenericSingNonce { get; } = RandomStringGenerator.Generate(100);
     }
 }

@@ -15,14 +15,14 @@ namespace EFund.Domain.Services
         Task<Network> GetNetworkByChainId(int chainId);
     }
 
-    public class ChainService : INetworkService
+    public class NetworkService : INetworkService
     {
         private readonly ImageService _imageService;
 
         private readonly string _connectionString;
 
 
-        public ChainService(IConfiguration configuration, ImageService imageService)
+        public NetworkService(IConfiguration configuration, ImageService imageService)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }

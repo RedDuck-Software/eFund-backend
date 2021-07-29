@@ -1,8 +1,10 @@
+using Api.Service;
 using EFund.Api.Attributes;
 using EFund.Api.Middlewares;
 using EFund.Api.Service;
 using EFund.Domain.Models.Repositories.Abstract;
 using EFund.Domain.Models.Repositories.Dapper;
+using EFund.Domain.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,12 @@ namespace EFund.Api
                             .AllowAnyMethod();
                     });
             });
+
+            services
+                .AddSingleton<ImageService>()
+                .AddSingleton<INetworkService, NetworkService>();
+
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

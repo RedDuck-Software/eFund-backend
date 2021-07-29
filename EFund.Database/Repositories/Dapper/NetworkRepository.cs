@@ -15,7 +15,11 @@ namespace EFund.Database.Repositories.Dapper
 
         public async Task<Network> GetNetworkByChainIdAsync(int chainId)
         {
-            return await SqlConnection.QueryFirstOrDefaultAsync<Network>($"SELECT * FROM nerworks WHERE ChainId={chainId}");
+            return await SqlConnection.QueryFirstOrDefaultAsync<Network>(
+                $"SELECT " +
+                $"n.ChainId, " +
+                $"convert(varchar(42),n.PlatformContractAddress, 1) as PlatfromContractAddress " +
+                $"FROM networks n WHERE ChainId={chainId}");
         }
     }
 }

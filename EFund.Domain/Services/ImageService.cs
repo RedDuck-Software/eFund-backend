@@ -4,29 +4,36 @@ using System.Threading.Tasks;
 using EFund.Domain.Extensions;
 using EFund.Domain.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Api.Service
 {
     public class ImageService
     {
-        public async Task<string> SaveImage(IFormFile file, string address)
+        public readonly string _imgFolderPath;
+
+        public ImageService(IConfiguration configuration)
         {
-            new DirectoryInfo("Images")
+            _imgFolderPath = configuration["ImageFolderPath"];
+        }
+
+        public async Task<string> SaveImage(IFormFile file, string address, int chainId)
+        {
+            var name = $"{RandomStringGenerator.Generate(5)}-{address}-{chainId}.jpeg";
+
+            new DirectoryInfo(_imgFolderPath)
                 .GetFiles()
-                .FirstOrDefault(fileInfo => fileInfo.Name.Contains(address))
+                .FirstOrDefault(fileInfo => fileInfo.Name.Contains(name))
                 ?.Delete();
 
-            var name = $"{RandomStringGenerator.Generate(5)}-{address}";
-            var path = Path.Combine("Images", $"{name}.jpeg");
-            
-            await using var stream = new FileStream(path, FileMode.Create);
+            await using var stream = new FileStream(Path.Combine(_imgFolderPath,name), FileMode.Create);
             await file.CopyToAsync(stream);
             stream.Flush();
 
-            return $"images/{name}.jpeg";
+            return name;
         }
 
         public async Task<byte[]> GetBytesArrayFromFileName(string name) =>
-            await File.ReadAllBytesAsync(Path.Combine("Images", name));
+            await File.ReadAllBytesAsync(Path.Combine(_imgFolderPath, name));
     }
 }

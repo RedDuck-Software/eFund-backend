@@ -21,13 +21,14 @@ namespace EFund.Database.Repositories.Dapper
         public async Task AddNewUser(string userAddress, string signNonce)
         {
             await SqlConnection.ExecuteAsync(
-                    $"Insert into users(Address,ChainId,SignNonce) VALUES(CONVERT(binary(20),{userAddress},1),{_chainId},{signNonce})");
+                    $"Insert into users(Address,ChainId,SignNonce) VALUES(CONVERT(binary(20),'{userAddress}',1),{_chainId},'{signNonce}')");
         }
 
         public async Task UpdateUser(User user)
         {
             await SqlConnection.ExecuteAsync(
-                $"Update users WHERE Address=CONVERT(binary(20),{user.Address},1) and ChainId={_chainId} SET SignNonce={user.SignNonce}, ImageUrl={user.ImgUrl}, Description={user.Description}, Username={user.Username}");
+                $"Update users SET SignNonce=@SignNonce, ImageUrl=@ImageUrl, Description=@Description, Username=@Username " +
+                    $"WHERE Address=CONVERT(binary(20),'{user.Address}',1) and ChainId={_chainId}", user);
         }
 
         public async Task UpdateUserNonce(User user, string newNonce)
@@ -40,7 +41,14 @@ namespace EFund.Database.Repositories.Dapper
         public async Task<User> GetUserByAddress(string address)
         {
             return await SqlConnection.QueryFirstOrDefaultAsync<User>(
-                $"SELECT * FROM users WHERE Address=CONVERT(binary(20),{address},1) and ChainId={_chainId}");
+                $"SELECT " +
+                $"convert(varchar(42),u.Address,1) as [Address] ,"+
+                $"u.ChainId, " +
+                $"u.SignNonce, " +
+                $"u.Username, " +
+                $"u.ImageUrl ," +
+                $"u.Description " +
+                $"FROM users u WHERE u.Address=CONVERT(binary(20),{address},1) and u.ChainId={_chainId}");
         }
     }
 }

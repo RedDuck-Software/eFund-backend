@@ -11,9 +11,11 @@ using EFund.Domain.Models.Request;
 using EFund.Api.Attributes;
 using Microsoft.Extensions.Configuration;
 using Api.Service;
+using System.ComponentModel.DataAnnotations;
 
 namespace EFund.Api.Controllers
 {
+    [Route("api/[controller]")]
     public class UserController : BaseController
     {
 
@@ -35,9 +37,14 @@ namespace EFund.Api.Controllers
         /// <returns>Personalized user nonce</returns>
         [HttpPost("register")]
         [ChainSpecified]
-        public async Task<string> RegisterUser([FromBody] RegisterUserRequest request )
+        public async Task<ActionResult<string>> RegisterUser([FromBody] RegisterUserRequest request )
         {
-            return await UserService.RegisterUser(request);
+           var res =  await UserService.RegisterUser(request);
+
+            if (res == null)
+                return BadRequest("User with this address is already exists");
+
+            return res;
         }
 
         /// <summary>
@@ -48,13 +55,18 @@ namespace EFund.Api.Controllers
         [HttpPost("updateUserInfo"), DisableRequestSizeLimit]
         [ChainSpecified]
         public async Task<string> UpdateUserInfo(
-                [FromForm] IFormFile image,
-                [FromForm] UpdateUserInfoRequest request)
+                IFormFile image,
+                [FromQuery] UpdateUserInfoRequest request)
         {
             return await UserService.UpdateUserInfo(image, request);
         }
 
+        [HttpGet("{userAddress}")]
+        [ChainSpecified]
+        public async Task<User> GetHedgeFundInfoByContractId([RegularExpression("^0x[a-fA-F0-9]{40}$")] string userAddress) =>
+            await UserService.GetUserByAddress(userAddress);
 
+        [HttpGet("getGenericSignNonce")]
         public string GetGenericSignNonce() => Config.GenericSingNonce;
     }
 }

@@ -6,7 +6,7 @@
 
         public string SignNonce { get; set; }
 
-        public string ImgUrl { get; set; }
+        public string ImageUrl { get; set; }
 
         public string Username { get; set; }
 

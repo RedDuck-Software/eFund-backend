@@ -41,9 +41,20 @@ namespace EFund.Domain.Services
 
         public async Task<string> UpdateUserInfo(IFormFile image, UpdateUserInfoRequest req)
         {
-            var nonce = GenerateNonce();
+            using (var uRepo = new UsersRepository(_connectionString, _chainId))
+            {
+                if (await uRepo.GetUserByAddress(req.Address) != null)
+                {
+                    var imgPath = await _imageService.SaveImage(image, req.Address, _chainId);
+                    var nonce = GenerateNonce();
 
-            return nonce;
+                    await uRepo.UpdateUser(new User { Address = req.Address, Description = req.Description, SignNonce = nonce, ImageUrl = imgPath, Username = req.Username });
+
+                    return nonce;
+                }
+                else
+                    return null;
+            }
         }
 
         public async Task<User> GetUserByAddress(string userAddress)
@@ -64,8 +75,19 @@ namespace EFund.Domain.Services
             if (!ValidateNonce(Config.GenericSingNonce, model.SignedGenericNonce, model.Address))
                 throw new Exception("Generic nonce signed wrong");
 
+
             using (var uRepo = new UsersRepository(_connectionString, _chainId))
-                await uRepo.AddNewUser(model.Address, nonce);
+            {
+                if (await uRepo.GetUserByAddress(model.Address) == null)
+                {
+                    await uRepo.AddNewUser(model.Address, nonce);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
 
             return nonce;
         }
