@@ -12,10 +12,12 @@ using EFund.Api.Attributes;
 using Microsoft.Extensions.Configuration;
 using Api.Service;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Cors;
 
 namespace EFund.Api.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors("AllowAll")]
     public class UserController : BaseController
     {
 
@@ -35,11 +37,18 @@ namespace EFund.Api.Controllers
         /// <summary>
         /// </summary>
         /// <returns>Personalized user nonce</returns>
-        [HttpPost("register")]
+        [HttpPost("register"), DisableRequestSizeLimit]
         [ChainSpecified]
-        public async Task<ActionResult<string>> RegisterUser([FromBody] RegisterUserRequest request )
+        public async Task<ActionResult<string>> RegisterUser(
+                                                [FromQuery] string address,
+                                                [FromQuery] string description,
+                                                [FromQuery] string signedNonce,
+                                                [FromQuery] string username,
+
+                                                IFormFile image
+            )
         {
-           var res =  await UserService.RegisterUser(request);
+            var res = await UserService.RegisterUser(new UpdateUserInfoRequest { Address = address, Description = description, SignedNonce = signedNonce, Username = username }, image);
 
             if (res == null)
                 return BadRequest("User with this address is already exists");

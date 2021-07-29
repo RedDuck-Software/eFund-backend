@@ -63,6 +63,8 @@ namespace EFund.Api
 
             app.UseRouting();
 
+            app.UseCors();
+
             app.UseMiddleware<ChainMiddleware>();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

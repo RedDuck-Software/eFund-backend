@@ -18,10 +18,11 @@ namespace EFund.Database.Repositories.Dapper
             _chainId = chainId;
         }
 
-        public async Task AddNewUser(string userAddress, string signNonce)
+        public async Task AddNewUser(User user)
         {
             await SqlConnection.ExecuteAsync(
-                    $"Insert into users(Address,ChainId,SignNonce) VALUES(CONVERT(binary(20),'{userAddress}',1),{_chainId},'{signNonce}')");
+                    $"Insert into users(Address,ChainId,SignNonce,Username,Description,ImageUrl) " +
+                    $"VALUES(CONVERT(binary(20),'{user.Address}',1),{_chainId},'{user.SignNonce}',{user.Username},{user.Description},{user.ImageUrl})");
         }
 
         public async Task UpdateUser(User user)
@@ -42,7 +43,7 @@ namespace EFund.Database.Repositories.Dapper
         {
             return await SqlConnection.QueryFirstOrDefaultAsync<User>(
                 $"SELECT " +
-                $"convert(varchar(42),u.Address,1) as [Address] ,"+
+                $"convert(varchar(42),u.Address,1) as [Address] ," +
                 $"u.ChainId, " +
                 $"u.SignNonce, " +
                 $"u.Username, " +

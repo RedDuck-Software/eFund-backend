@@ -2,6 +2,7 @@
 using EFund.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EFund.Api.Middlewares
@@ -17,7 +18,9 @@ namespace EFund.Api.Middlewares
 
         public async Task Invoke(HttpContext context, INetworkService networkService)
         {
-            if (context.Request.Headers.ContainsKey("ChainId"))
+            var header = context.Request.Headers["ChainId"];
+
+            if (header.Any())
             {
                 int chainId = Convert.ToInt32(context.Request.Headers["ChainId"]);
 

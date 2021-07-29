@@ -17,7 +17,7 @@ namespace EFund.Domain.Services
     public interface IUserService
     {
         Task<string> UpdateUserInfo(IFormFile image, UpdateUserInfoRequest req);
-        Task<string> RegisterUser(RegisterUserRequest model);
+        Task<string> RegisterUser(UpdateUserInfoRequest model, IFormFile image = null);
         Task<User> GetUserByAddress(string userAddress);
     }
 
@@ -68,11 +68,11 @@ namespace EFund.Domain.Services
             return RandomStringGenerator.Generate(40);
         }
 
-        public async Task<string> RegisterUser(RegisterUserRequest model)
+        public async Task<string> RegisterUser(UpdateUserInfoRequest model, IFormFile image = null)
         {
             var nonce = GenerateNonce();
 
-            if (!ValidateNonce(Config.GenericSingNonce, model.SignedGenericNonce, model.Address))
+            if (!ValidateNonce(Config.GenericSingNonce, model.SignedNonce, model.Address))
                 throw new Exception("Generic nonce signed wrong");
 
 
@@ -80,7 +80,17 @@ namespace EFund.Domain.Services
             {
                 if (await uRepo.GetUserByAddress(model.Address) == null)
                 {
-                    await uRepo.AddNewUser(model.Address, nonce);
+                    string imgPath = image == null ? null : await _imageService.SaveImage(image, model.Address, _chainId);
+
+                    await uRepo.AddNewUser(new User
+                    {
+                        Address = model.Address,
+                        ChainId = _chainId,
+                        Description = model.Description,
+                        ImageUrl = imgPath,
+                        SignNonce = nonce,
+                        Username = model.Username
+                    });
                 }
                 else
                 {
