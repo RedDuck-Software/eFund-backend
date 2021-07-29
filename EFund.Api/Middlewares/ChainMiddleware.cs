@@ -1,4 +1,5 @@
-﻿using EFund.Domain.Services;
+﻿using EFund.Database.Entities;
+using EFund.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
@@ -16,12 +17,15 @@ namespace EFund.Api.Middlewares
 
         public async Task Invoke(HttpContext context, INetworkService networkService)
         {
-            int chainId = Convert.ToInt32(context.Request.Headers["ChainId"]);
-            
-            var network = await networkService.GetNetworkByChainId(chainId);
+            if (context.Request.Headers.ContainsKey("ChainId"))
+            {
+                int chainId = Convert.ToInt32(context.Request.Headers["ChainId"]);
 
-            if (network != null)
-                context.Items["Network"] = network;
+                var network = await networkService.GetNetworkByChainId(chainId);
+
+                if (network != null)
+                    context.Items["Network"] = network;
+            }
 
             await _next(context);
         }
