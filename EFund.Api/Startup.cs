@@ -1,4 +1,5 @@
 using EFund.Api.Attributes;
+using EFund.Api.Middlewares;
 using EFund.Api.Service;
 using EFund.Domain.Models.Repositories.Abstract;
 using EFund.Domain.Models.Repositories.Dapper;
@@ -54,7 +55,7 @@ namespace EFund.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseMiddleware<ChainMiddleware>();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

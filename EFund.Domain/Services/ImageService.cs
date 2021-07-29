@@ -28,8 +28,5 @@ namespace Api.Service
 
         public async Task<byte[]> GetBytesArrayFromFileName(string name) =>
             await File.ReadAllBytesAsync(Path.Combine("Images", name));
-
-
-       
     }
 }
