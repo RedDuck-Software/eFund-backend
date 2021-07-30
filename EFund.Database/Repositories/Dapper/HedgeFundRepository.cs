@@ -22,13 +22,19 @@ namespace EFund.Domain.Models.Repositories.Dapper
         public async Task<HedgeFundInfo> GetHedgeFundInfoByContractAddress(string contractAddress)
         {
             return await SqlConnection.QueryFirstOrDefaultAsync<HedgeFundInfo>(
-                $"SELECT * FROM hedgefund_infos WHERE ContractAddress=CONVERT(binary(20),'{contractAddress}',1) and ChainId={_chainId}");
+                $"SELECT " +
+                    $"convert(varchar(42),h.ContractAddress,1) as ContractAddress, " +
+                    $"ChainId, " +
+                    $"Name, " +
+                    $"Description, " +
+                    $"ImageUrl " +
+                $" FROM hedgefund_infos h WHERE ContractAddress=CONVERT(binary(20),'{contractAddress}',1) and ChainId={_chainId}");
         }
 
         public async Task SaveHedgeFundInfo(HedgeFundInfo hedgeFundInfo)
         {
             await SqlConnection.ExecuteAsync(
-                $"INSERT INTO hedgefund_infos VALUES(CONVERT(binary(20),'{hedgeFundInfo.ContractAddress}',1),{_chainId}, '{hedgeFundInfo.Name}', '{hedgeFundInfo.Description}', '{hedgeFundInfo.ImageUrl}');");
+                $"INSERT INTO hedgefund_infos VALUES(CONVERT(binary(20),'{hedgeFundInfo.ContractAddress}',1),{_chainId}, @Name, @Description, @ImageUrl);", hedgeFundInfo);
         }
 
         public async Task DeleteHedgeFundInfoByContractId(string contractAddress)

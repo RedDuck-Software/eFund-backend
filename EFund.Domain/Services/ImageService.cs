@@ -26,14 +26,23 @@ namespace Api.Service
                 .FirstOrDefault(fileInfo => fileInfo.Name.Contains(name))
                 ?.Delete();
 
-            await using var stream = new FileStream(Path.Combine(_imgFolderPath,name), FileMode.Create);
+            await using var stream = new FileStream(Path.Combine(_imgFolderPath, name), FileMode.Create);
             await file.CopyToAsync(stream);
             stream.Flush();
 
             return name;
         }
 
-        public async Task<byte[]> GetBytesArrayFromFileName(string name) =>
-            await File.ReadAllBytesAsync(Path.Combine(_imgFolderPath, name));
+        public async Task<byte[]> GetBytesArrayFromFileName(string name)
+        {
+            try
+            {
+                return await File.ReadAllBytesAsync(Path.Combine(_imgFolderPath, name));
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Api.Service;
 using EFund.Api.Attributes;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace EFund.Api.Controllers
 {
     [Route("[controller]")]
+    [EnableCors("AllowAll")]
     public class ImageController : BaseController
     {
         private ImageService ImageService { get; }

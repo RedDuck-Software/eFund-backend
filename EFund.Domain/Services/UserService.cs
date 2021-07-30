@@ -43,9 +43,12 @@ namespace EFund.Domain.Services
         {
             using (var uRepo = new UsersRepository(_connectionString, _chainId))
             {
-                if (await uRepo.GetUserByAddress(req.Address) != null)
+                var user = await uRepo.GetUserByAddress(req.Address);
+
+                if (user != null)
                 {
-                    var imgPath = await _imageService.SaveImage(image, req.Address, _chainId);
+                    var imgPath = image == null ? user.ImageUrl : await _imageService.SaveImage(image, req.Address, _chainId);
+                
                     var nonce = GenerateNonce();
 
                     await uRepo.UpdateUser(new User { Address = req.Address, Description = req.Description, SignNonce = nonce, ImageUrl = imgPath, Username = req.Username });
@@ -70,6 +73,9 @@ namespace EFund.Domain.Services
 
         public async Task<string> RegisterUser(UpdateUserInfoRequest model, IFormFile image = null)
         {
+            if (model == null)
+                throw new ArgumentNullException("Model cannot be null");
+
             var nonce = GenerateNonce();
 
             if (!ValidateNonce(Config.GenericSingNonce, model.SignedNonce, model.Address))

@@ -21,8 +21,8 @@ namespace EFund.Database.Repositories.Dapper
         public async Task AddNewUser(User user)
         {
             await SqlConnection.ExecuteAsync(
-                    $"Insert into users(Address,ChainId,SignNonce,Username,Description,ImageUrl) " +
-                    $"VALUES(CONVERT(binary(20),'{user.Address}',1),{_chainId},'{user.SignNonce}',{user.Username},{user.Description},{user.ImageUrl})");
+                    $"Insert into users([Address],[ChainId],[SignNonce],[Username],[Description],[ImageUrl]) " +
+                    $"VALUES(CONVERT(binary(20),'{user.Address}',1),{_chainId},@SignNonce,@Username,@Description,@ImageUrl)", user);
         }
 
         public async Task UpdateUser(User user)

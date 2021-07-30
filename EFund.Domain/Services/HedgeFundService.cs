@@ -37,9 +37,11 @@ namespace EFund.Domain.Services
         {
             using (var hRepo = new HedgeFundRepository(_connectionString, _chainId))
             {
-                var path = await _imageService.SaveImage(image, info.ContractAddress, _chainId);
-
-                info.ImageUrl = path;
+                if (image != null)
+                {
+                    var path = await _imageService.SaveImage(image, info.ContractAddress, _chainId);
+                    info.ImageUrl = path;
+                }
 
                 if (await hRepo.GetHedgeFundInfoByContractAddress(info.ContractAddress) != null)
                     throw new ArgumentException($"Database is already contains information about contract with address {info.ContractAddress}");

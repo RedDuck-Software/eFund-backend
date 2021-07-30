@@ -40,15 +40,11 @@ namespace EFund.Api.Controllers
         [HttpPost("register"), DisableRequestSizeLimit]
         [ChainSpecified]
         public async Task<ActionResult<string>> RegisterUser(
-                                                [FromQuery] string address,
-                                                [FromQuery] string description,
-                                                [FromQuery] string signedNonce,
-                                                [FromQuery] string username,
-
+                                                [FromQuery] UpdateUserInfoRequest request,
                                                 IFormFile image
             )
         {
-            var res = await UserService.RegisterUser(new UpdateUserInfoRequest { Address = address, Description = description, SignedNonce = signedNonce, Username = username }, image);
+            var res = await UserService.RegisterUser(request, null);
 
             if (res == null)
                 return BadRequest("User with this address is already exists");

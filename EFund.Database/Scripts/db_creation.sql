@@ -11,7 +11,7 @@ CREATE TABLE [hedgefund_infos] (
   [ChainId] SMALLINT NOT NULL FOREIGN KEY REFERENCES networks([ChainId]),
   [Name] VARCHAR(255) NOT NULL,
   [Description] VARCHAR(255) NULL, 
-  [ImageUrl] VARCHAR(100) NOT NULL, 
+  [ImageUrl] VARCHAR(100) NULL, 
 );
 
 create Table [users] (
