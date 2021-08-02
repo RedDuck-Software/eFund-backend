@@ -16,7 +16,7 @@ namespace EFund.Api.Attributes
         {
             if ((Network)context.HttpContext.Items["Network"] == null)
             {
-                context.Result = new JsonResult(new { message = "ChainId must be specified as request header" })
+                context.Result = new JsonResult(new { message = "ChainId must be specified as request header OR chainId it`s invalid" })
                 {
                     StatusCode = StatusCodes.Status405MethodNotAllowed
                 };
