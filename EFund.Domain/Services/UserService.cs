@@ -45,10 +45,13 @@ namespace EFund.Domain.Services
             {
                 var user = await uRepo.GetUserByAddress(req.Address);
 
+                if (!ValidateNonce(user.SignNonce, req.SignedNonce, req.Address))
+                    throw new Exception("Nonce signed wrong");
+
                 if (user != null)
                 {
                     var imgPath = image == null ? user.ImageUrl : await _imageService.SaveImage(image, req.Address, _chainId);
-                
+
                     var nonce = GenerateNonce();
 
                     await uRepo.UpdateUser(new User { Address = req.Address, Description = req.Description, SignNonce = nonce, ImageUrl = imgPath, Username = req.Username });
@@ -76,7 +79,6 @@ namespace EFund.Domain.Services
             if (model == null)
                 throw new ArgumentNullException("Model cannot be null");
 
-            var nonce = GenerateNonce();
 
             if (!ValidateNonce(Config.GenericSingNonce, model.SignedNonce, model.Address))
                 throw new Exception("Generic nonce signed wrong");
@@ -88,6 +90,8 @@ namespace EFund.Domain.Services
                 {
                     string imgPath = image == null ? null : await _imageService.SaveImage(image, model.Address, _chainId);
 
+                    var nonce = GenerateNonce();
+
                     await uRepo.AddNewUser(new User
                     {
                         Address = model.Address,
@@ -97,21 +101,16 @@ namespace EFund.Domain.Services
                         SignNonce = nonce,
                         Username = model.Username
                     });
-                }
-                else
-                {
-                    return null;
+                    return nonce;
+
                 }
             }
 
-
-            return nonce;
+            return null;
         }
 
         private bool ValidateNonce(string original, string signed, string signer)
         {
-            return true;
-
             var msgSigner = new EthereumMessageSigner();
 
             var addr = msgSigner.EncodeUTF8AndEcRecover(original, signed);

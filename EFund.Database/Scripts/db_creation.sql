@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS [efund];
+CREATE DATABASE [efund];
 USE [efund];
 
 CREATE TABLE [networks] ( 
