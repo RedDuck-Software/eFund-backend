@@ -1,6 +1,3 @@
-CREATE DATABASE [efund];
-USE [efund];
-
 CREATE TABLE [networks] ( 
   [ChainId] SMALLINT NOT NULL PRIMARY KEY,
   [PlatformContractAddress] BINARY(20) NOT NULL 

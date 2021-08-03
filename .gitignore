@@ -341,3 +341,7 @@ healthchecksdb
 
 # Rider
 .idea/
+
+
+Images/
+!Images/default.jpeg

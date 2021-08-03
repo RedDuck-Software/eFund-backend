@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EFund.Domain.Extensions;
@@ -35,11 +36,15 @@ namespace Api.Service
 
         public async Task<byte[]> GetBytesArrayFromFileName(string name)
         {
+            // if null - then default
+            if (name is null)
+                return await File.ReadAllBytesAsync(Path.Combine(Environment.CurrentDirectory, "default.jpeg"));
+
             try
             {
                 return await File.ReadAllBytesAsync(Path.Combine(_imgFolderPath, name));
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 return null;
             }
