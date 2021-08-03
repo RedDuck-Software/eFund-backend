@@ -22,5 +22,5 @@ create Table [users] (
 
 CREATE TABLE images (
     Id VARCHAR(255) PRIMARY KEY NOT NULL,
-    Image VARCHAR(MAX) NOT NULL
+    Image VARBINARY(MAX) NOT NULL
 )
