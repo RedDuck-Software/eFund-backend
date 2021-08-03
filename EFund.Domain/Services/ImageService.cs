@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using EFund.Database.Entities;
+using EFund.Database.Repositories.Dapper;
 using EFund.Domain.Extensions;
 using EFund.Domain.Services;
 using Microsoft.AspNetCore.Http;
@@ -11,43 +13,39 @@ namespace Api.Service
 {
     public class ImageService
     {
-        public readonly string _imgFolderPath;
+        public readonly string _connectionString;
 
         public ImageService(IConfiguration configuration)
         {
-            _imgFolderPath = configuration["ImageFolderPath"];
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<string> SaveImage(IFormFile file, string address, int chainId)
+        public async Task<string> SaveImage(IFormFile file, string address, int chainId, string type = "jpeg")
         {
-            var name = $"{RandomStringGenerator.Generate(5)}-{address}-{chainId}.jpeg";
+            var bytes = new byte[file.Length];
+            await file.OpenReadStream().ReadAsync(bytes);
+            
+            var name = $"{ RandomStringGenerator.Generate(5) }-{ address }-{ chainId }.{type}";
 
-            new DirectoryInfo(_imgFolderPath)
-                .GetFiles()
-                .FirstOrDefault(fileInfo => fileInfo.Name.Contains(name))
-                ?.Delete();
+            var dataImage = new DataImage
+            {
+                Id = name,
+                Image = bytes,
+            };
 
-            await using var stream = new FileStream(Path.Combine(_imgFolderPath, name), FileMode.Create);
-            await file.CopyToAsync(stream);
-            stream.Flush();
+            using (var iRepo = new ImageRepository(_connectionString))
+            {
+                await iRepo.AddAsync(dataImage);
+            }
 
             return name;
         }
 
-        public async Task<byte[]> GetBytesArrayFromFileName(string name)
+        public async Task<byte[]> GetBytesArrayById(string id)
         {
-            // if null - then default
-            if (name is null)
-                return await File.ReadAllBytesAsync(Path.Combine(Environment.CurrentDirectory, "default.jpeg"));
-
-            try
-            {
-                return await File.ReadAllBytesAsync(Path.Combine(_imgFolderPath, name));
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            using var iRepo = new ImageRepository(_connectionString);
+            var dataImage = await iRepo.GetByKeyAsync(id);
+            return dataImage == null ? null : Convert.FromBase64String(Convert.ToBase64String(dataImage.Image));
         }
     }
 }

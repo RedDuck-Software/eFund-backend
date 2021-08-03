@@ -24,8 +24,8 @@ namespace EFund.Api.Controllers
         [Route("{name}")]
         public async Task<IActionResult> GetImage(string name)
         {
-            var res = await ImageService.GetBytesArrayFromFileName(name) ??
-                      await ImageService.GetBytesArrayFromFileName("default.jpeg");
+            var res = await ImageService.GetBytesArrayById(name) ??
+                      await ImageService.GetBytesArrayById("default.jpeg");
 
             return File(res, "image/jpeg");
         }

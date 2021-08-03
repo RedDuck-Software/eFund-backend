@@ -19,3 +19,8 @@ create Table [users] (
 	[ImageUrl] VARCHAR(100) NULL, 
 	[Description] VARCHAR(100) NULL, 
 )
+
+CREATE TABLE images (
+    Id VARCHAR(255) PRIMARY KEY NOT NULL,
+    Image VARCHAR(MAX) NOT NULL
+)
